@@ -5,6 +5,7 @@ import requests
 import pandas as pd
 import math
 import time
+from datetime import datetime, timedelta
 
 __df_predict = None
 __data_columns = None
@@ -27,8 +28,8 @@ def get_player(user):
         time.sleep(1 - (current_time - __last_api_request))
     response = requests.get(f"https://ch.tetr.io/api/users/{user.lower()}")
     data_predict = response.json()
-    df_predict1 = pd.DataFrame(data_predict)
-    __df_predict = pd.json_normalize(df_predict1['data'])
+    df_predict = pd.DataFrame(data_predict)
+    __df_predict = pd.json_normalize(df_predict['data'])
 
     __last_api_request = time.time()
 
@@ -55,9 +56,39 @@ def get_predicted_TR(user):
     if ((rank != 'x')):
         x[rank] = 1
 
-    predicted = round(__model.predict(x)[0], 2)
+    rd = get_RD(__df_predict['_id'][0], __df_predict['league.rd'][0])
+
+    predicted_glicko = __model.predict(x)[0]
+    print(predicted_glicko)
+    predicted = calculate_TR(predicted_glicko,rd)
 
     return predicted
+
+def calculate_TR(glicko,rd):
+    TR = round(25000/(1+np.power(10, (1500-glicko)*np.pi/(np.sqrt(3*np.log(10)*np.log(10)*rd*rd+2500*(64*np.pi*np.pi+147*np.log(10)*np.log(10)))))), 2)
+    return TR
+
+def get_RD(user_id, rd):
+    response = requests.get(f"https://ch.tetr.io/api/streams/league_userrecent_{user_id}")
+    user_data = response.json()
+    df_user = pd.DataFrame(user_data)
+    df_user1 = pd.json_normalize(df_user['data']).T
+    df_user2 = pd.json_normalize(df_user1[0],sep =',')
+    try:
+        date = datetime.strptime(df_user2['ts'][0], '%Y-%m-%dT%H:%M:%S.%fZ')
+    except:
+        return 70
+
+    now = datetime.utcnow()
+    week_ago = now - timedelta(weeks=1)
+
+    if date < week_ago:
+        day_difference = now - date
+        rd_change = day_difference.days
+        return rd-rd_change
+    else:
+        return rd
+
 
 
 def load_saved_artifacts():

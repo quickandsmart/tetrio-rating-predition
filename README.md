@@ -14,4 +14,4 @@ Once you've downloaded the files first make sure you have the correct package ve
 
 ## Future Work
 
-One of the major issues I ran into was the Linear Regression and Lasso models predicting beyond the TR range (0-25,000) so I will look to implement additional models in my test to get better predictions. I will also add additional quality of life features on the website such as letting the user know when the account they're trying to predict doesn't exist or hasn't played Tetra league.
+I plan on trying more models such as random forest to see if they can handle outliers even better than the current models I use. I will also add additional quality of life features on the website such as letting the user know when the account they're trying to predict doesn't exist or hasn't played Tetra league and proving the players current Tetra League stats .
