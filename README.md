@@ -1,3 +1,5 @@
+![image](https://user-images.githubusercontent.com/52612115/231041991-bbb2fd36-b6ce-4e87-b5c4-b2b9e9dcd4c2.png)
+
 # Tetra League TR Prediction
 
 ## Project Description
